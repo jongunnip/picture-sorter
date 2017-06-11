@@ -1,6 +1,5 @@
 package org.gunnip.picturesorter;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -8,8 +7,6 @@ import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Take jpg images or mp4 files from subdirectories of a source dir matching a patterns
@@ -49,8 +46,8 @@ public class PictureSorter {
 	}
 
 	private static void moveFile(Path file, Path targetDir)  {
-		String date = getCreationDate(file);
-		Path newFile = Paths.get(targetDir.toString(), date, file.toFile().getName());
+		String modificationDate = getModificationDate(file);
+		Path newFile = Paths.get(targetDir.toString(), modificationDate, file.toFile().getName());
 		newFile.toFile().getParentFile().mkdirs();
 		System.out.printf("\tFile %s moving to %s\n", file.toFile().getAbsolutePath(), newFile);
 		try {
@@ -71,7 +68,7 @@ public class PictureSorter {
 		System.exit(1);
 	}
 
-	private static String getCreationDate(Path file) {
+	private static String getModificationDate(Path file) {
 		DateFormat df = new SimpleDateFormat("yyyy_MM_dd");
 		BasicFileAttributes attr;
 		try {
@@ -79,6 +76,6 @@ public class PictureSorter {
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
-		return df.format(attr.creationTime().toMillis());
+		return df.format(attr.lastModifiedTime().toMillis());
 	}
 }
