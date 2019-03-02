@@ -47,7 +47,7 @@ public class PictureSorter {
 
 	private static void moveFile(Path file, Path targetDir)  {
 		String modificationDate = getModificationDate(file);
-		Path newFile = Paths.get(targetDir.toString(), modificationDate, file.toFile().getName());
+		Path newFile = getNewFileName(file, targetDir, modificationDate);
 		newFile.toFile().getParentFile().mkdirs();
 		System.out.printf("\tFile %s moving to %s\n", file.toFile().getAbsolutePath(), newFile);
 		try {
@@ -55,6 +55,18 @@ public class PictureSorter {
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	private static Path getNewFileName(Path file, Path targetDir, String modificationDate) {
+		Path newFile;
+		int i = 0;
+		do {
+			String fileName = i > 0 ? file.toFile().getName().replace(".", "_" + i + ".") : file.toFile().getName();
+			newFile = Paths.get(targetDir.toString(), modificationDate, fileName);
+			i++;
+			System.out.println("Checking " + newFile);
+		} while (newFile.toFile().exists());
+		return newFile;
 	}
 
 	private static void checkDir(Path sourceDir) {
