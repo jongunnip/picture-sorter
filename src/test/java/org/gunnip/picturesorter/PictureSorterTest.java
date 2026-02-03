@@ -115,4 +115,20 @@ public class PictureSorterTest {
 
         assertEquals(expectedDestFiles, actualDestFiles);
     }
+
+    @Test
+    public void testNoResourceLeaksWithManyFiles() throws IOException {
+        // Create 100 test files
+        for (int i = 0; i < 100; i++) {
+            File file = source.newFile("image" + i + ".jpg");
+            FileUtils.write(file, "content" + i, "UTF-8");
+            file.setLastModified(System.currentTimeMillis());
+        }
+
+        // Process all files - should not throw "too many open files"
+        sorter.processImageDir(source.getRoot().toPath(), dest.getRoot().toPath(), "test");
+
+        // Verify all files were processed
+        assertEquals(0, source.getRoot().listFiles().length);
+    }
 }
